@@ -1,0 +1,57 @@
+@(receiver_email: String, sender: String, number: Int, kooboodleWebSeverHost: String, cover_url: String, login_url: String)
+
+<div style="padding:10px 0">
+    <table cellspacing="0" cellpadding="0" style="width:100%">
+        <tbody>
+            <tr>
+                <td>
+                    <p style="font-family: Arial, sans-serif; font-size:14px; color:#4d4d4d; margin-bottom:10px;">
+                        @sender  has privately shared with you @number photo@if(number==1){} else {s} using Kooboodle.com.
+                    </p>
+                    <p style="font-family: Arial, sans-serif; font-size:14px; color:#4d4d4d; margin-bottom:10px;">
+                        Here is one of @sender's great photos:
+                    </p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div style="background:url('http://@kooboodleWebSeverHost/assets/themes/clickfree2.0/images/BG.jpg') no-repeat center; ">
+    <p align="center"><img src="@cover_url" style="-webkit-box-shadow: 0px 2px 5px 0px rgba(50, 50, 50, 0.67); -moz-box-shadow: 0px 2px 5px 0px rgba(50, 50, 50, 0.67); box-shadow: 0px 2px 5px 0px rgba(50, 50, 50, 0.67);" width="240" /></p>
+</div>
+<div style="margin-bottom:5px;">
+    <p style="font-family: Arial, sans-serif; font-size:14px; color:#4d4d4d;"><a href="@login_url" style="color:#b60751">View all of @sender's great photos</a>.</p>
+</div>
+
+<div style="padding:10px 0">
+    <table cellspacing="0" cellpadding="0" style="width:100%">
+        <tbody>
+        <tr>
+            <td>
+                <hr>
+                <h3 style="font-family: Arial, sans-serif; font-size:20px; color:#4d4d4d;">Get the most out of Kooboodle with Kooboodle MeFinder for Mobile and the Kooboodle PhotoFinder desktop app</h3>
+                <p style="font-family: Arial, sans-serif; font-size:14px; color:#4d4d4d; margin-bottom:15px;"><img src="http://@kooboodleWebSeverHost/assets/themes/clickfree2.0/images/logo-photofinder-small.png" style="vertical-align: middle" /> <a href="http://@kooboodleWebSeverHost/PhotoFinder" style="color:#b60751">Download Kooboodle PhotoFinder</a></p>
+                <p style="font-family: Arial, sans-serif; font-size:14px; color:#4d4d4d; margin-bottom:10px;">Kooboodle PhotoFinder is a desktop app that backs up and stores your uploaded photos with bank-level encryption -- for free. PhotoFinder will also automatically find photos from shared events with people you invite.</p>
+                <p class="link-desktop" style="font-family: Arial, sans-serif; font-size:14px; color:#4d4d4d; margin-bottom:10px;"><a href="http://@kooboodleWebSeverHost/PhotoFinder" style="color:#b60751">Download Kooboodle PhotoFinder</a> today.</p>
+                <P style="font-family: Arial, sans-serif; font-size:14px; color:#4d4d4d; margin-bottom:10px; border-bottom:1px solid #CDCDD0; width:100%"></P>
+                <p style="font-family: Arial, sans-serif; font-size:14px; color:#4d4d4d; margin-bottom:15px;"><img src="http://@kooboodleWebSeverHost/assets/themes/clickfree2.0/images/logo-mefinder-small.png" style="vertical-align: middle" /> <a href="http://www.mefinderapp.com" style="color:#b60751">Download Kooboodle MeFinder</a></p>
+                <p style="font-family: Arial, sans-serif; font-size:14px; color:#4d4d4d; margin-bottom:10px;">Kooboodle lets you view your photos on all your devices - anywhere. Kooboodle for Mobile now includes MeFinder, an exciting new way to collect the photos you want the most from your friends' mobile phones... the ones you're in.</p>
+                <p class="link-desktop" style="font-family: Arial, sans-serif; font-size:14px; color:#4d4d4d; margin-bottom:10px;"><a href="http://www.mefinderapp.com" style="color:#b60751">Download Kooboodle MeFinder</a> today.</p>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div style="padding:2px 0; border-top:1px solid #bbbbbb;">
+    <table cellspacing="0" cellpadding="0" style="width:100%;border-top:1px solid #bbbbbb; margin-top:2px; ">
+        <tbody>
+        <tr>
+            <td align="center" style="font-family: Arial, sans-serif; font-size:12px; color:#4d4d4d; margin-bottom:10px;">
+                This email is send to @receiver_email.<br/>
+                <a href="http://@kooboodleWebSeverHost">Why did I get this?</a><br/>
+                Clickfree - Storage Appliance Corporation - 30 West Beaver Creek Road Unit 115 - Richmond Hill, Ontario L4B 3K1 - Canada
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

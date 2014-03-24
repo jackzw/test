@@ -8,6 +8,7 @@ import java.io._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import org.anormcypher._
+import com.typesafe.plugin._
 
 object myController extends ApiController {
   
@@ -28,4 +29,5 @@ object myController extends ApiController {
     		responseF.map( response => apiResponse(response) )
         }
 	}
+
 }

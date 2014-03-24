@@ -13,7 +13,8 @@ libraryDependencies ++= Seq(
   "org.apache.tomcat" % "tomcat-jdbc" % "8.0.3",
   cache,
   "com.typesafe.slick" %% "slick" % "2.0.0",
-  "org.anormcypher" %% "anormcypher" % "0.4.4"
+  "org.anormcypher" %% "anormcypher" % "0.4.4",
+  "com.typesafe" %% "play-plugins-mailer" % "2.2.0"
 )     
 
 play.Project.playScalaSettings
