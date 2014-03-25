@@ -17,4 +17,6 @@ GET     /movie/list                 controllers.MovieController.list
 
 GET 	/user/connected				controllers.myController.listConnectedUsers(uid: Option[String])
 
-POST	/photo/share				controllers.myController.sharePhotos(shareType: Option[Int], pids: String, recipients: String)
+# use Cypher
+POST	/share/photos				controllers.ShareController.sharePhotos(shareType: Option[Int], pids: String, recipients: String)
+POST	/share/photos/accept		controllers.ShareController.sharePhotosAccept(shareid: String)

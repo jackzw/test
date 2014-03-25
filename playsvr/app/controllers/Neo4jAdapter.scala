@@ -41,19 +41,21 @@ object Neo4jAdapter {
 
     val query = s"""
     	MATCH (u:User {uid:'$uid'})-[r]->(pc:PhotoCollection)<-[:uploaded]-(p:Photo),
-    		(u:User {uid:'$uid'})-[l]->(pe:PersonalExchange)
+    		(u:User)-[l]->(pe:PersonalExchange)
     	WHERE $where
-    	CREATE UNIQUE (p)-[:shared]->(s:Share {shareid:'$shareid', shareType:$shareType, timestamp:timestamp()/1000})<-[:shared_sent]-(pe)
+    	CREATE UNIQUE (p)-[:shared]->(s:Share {shareid:'$shareid', shareType:$shareType, timestamp:timestamp()/1000})<-[:shared_sent {timestamp:timestamp()/1000}]-(pe)
     """
     	
     if(Cypher(query).execute()) shareid else null
   }
   
-  def createSharedToUsers(shareid: String, status: Int, emailArray: Array[String]) = {
+  // crate batch share_to connected users
+  def createSharedToConnectedUsers(uid: String, shareid: String, status: Int, emailArray: Array[String]) = {
     val where = (emailArray map(email => "u.email='%s'" format (email))).mkString(" or ")
 
     val query = s"""
-    	MATCH (s:Share {shareid:'$shareid'}), 
+    	MATCH (s:Share {shareid:'$shareid'}),
+    	      (:User {uid:'$uid'})-[:connected_user]-(u:User),
     		  (u:User)-[:personal_exchange]->(pe:PersonalExchange) 
     	WHERE $where 
     	MERGE (s)-[r:shared_to]->(pe) 
@@ -61,15 +63,15 @@ object Neo4jAdapter {
     	RETURN u.email
     """
 
-    val sharedTo = Cypher(query).apply().map(u => 
+    val validated = Cypher(query).apply().map(u => 
       u[String]("u.email")
 	).toArray
 	
-	val pending = emailArray diff sharedTo
+	val pending = emailArray diff validated
 	
-	Map("shared_to"->sharedTo.mkString(","), "pending"->pending.mkString(","))
+	Map("validated"->validated.mkString(","), "pending"->pending.mkString(","))
   }
-
+  
   def sharePhotos(uid: String, pids: String, shareType: Int, recipients: String): Future[ApiResponse] = {
     val pidArray = pids.split(",").map(_.trim)
     val shareid = this.createShare(uid, pidArray, shareType)
@@ -77,22 +79,34 @@ object Neo4jAdapter {
       Future(ApiResponse(500, "Error when create share node.", null))
     } else {
       val emailArray = recipients.split(",").map(_.trim)
-      val processed = this.createSharedToUsers(shareid, Enum.SHARE_STATUS_INVITED, emailArray)
-      val shared_to = processed.get("shared_to") getOrElse ""
+      val processed = this.createSharedToConnectedUsers(uid, shareid, Enum.SHARE_STATUS_INVITED, emailArray)
+      val shared_to = processed.get("validated") getOrElse ""
       val pending = processed.get("pending")  getOrElse ""
       if(!pending.isEmpty()) {
 	    val query = s"""
 	    	MATCH (u:User {uid:'$uid'})-[l]->(pe:PersonalExchange)-[:shared_sent]->(s:Share {shareid:'$shareid'})
-	    	SET s.pending='$pending'
+	    	SET s.pending='{$pending}'
 	    """
 	    if(!Cypher(query).execute()) {
 	      Future(ApiResponse(501, "Error when set share pending recipient.", null))
 	    } else {
-	    	Future(ApiResponse(200, "Photo shared", Json.obj("shared_to" -> processed.get("shared_to"), "pending" -> pending)))    
+	    	Future(ApiResponse(200, "Photo shared", Json.obj("shared_to" -> shared_to, "pending" -> pending)))    
 	    }
       } else {
-	    	Future(ApiResponse(200, "Photo shared", Json.obj("shared_to" -> processed.get("shared_to"))))            
+	    	Future(ApiResponse(200, "Photo shared", Json.obj("shared_to" -> shared_to)))            
       }
+    }
+  }
+  
+  def sharePhotosAccept(uid: String, shareid: String): Future[ApiResponse] = {
+    val query = s"""
+    	MATCH (u:User {uid:'$uid'})-[l]->(pe:PersonalExchange)<-[:shared_to]->(s:Share {shareid:'$shareid'})
+    	ON CREATE SET s.timestamp=timestamp()/1000
+    """
+    if(!Cypher(query).execute()) {
+      Future(ApiResponse(501, "Error when accept share.", null))
+    } else {
+    	Future(ApiResponse(200, "share accepted", Json.obj("shareid" -> shareid)))    
     }
   }
 

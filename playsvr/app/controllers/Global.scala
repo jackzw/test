@@ -31,6 +31,6 @@ object Global extends GlobalSettings {
     }
 
     override def onStart(app: Application) {
-		Neo4jREST.setServer(Configure.neo4jHost)
+		
     }
 }

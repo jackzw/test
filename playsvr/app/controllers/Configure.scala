@@ -66,5 +66,7 @@ object Configure {
 	  json
 	}
 	
+	Neo4jREST.setServer(Configure.neo4jHost)
+	
 	printInfo
 }
