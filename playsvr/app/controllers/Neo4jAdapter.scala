@@ -20,7 +20,6 @@ object ConnectedUserInfo {
 }
 
 object Neo4jAdapter {
-
   def listConnectedUsers(uid: String): Future[ApiResponse] = {
     val query = s"""
     	MATCH (m:User)-[:connected]-(n:User)
@@ -99,15 +98,37 @@ object Neo4jAdapter {
   }
   
   def sharePhotosAccept(uid: String, shareid: String): Future[ApiResponse] = {
+    
     val query = s"""
-    	MATCH (u:User {uid:'$uid'})-[l]->(pe:PersonalExchange)<-[:shared_to]->(s:Share {shareid:'$shareid'})
-    	ON CREATE SET s.timestamp=timestamp()/1000
-    """
-    if(!Cypher(query).execute()) {
-      Future(ApiResponse(501, "Error when accept share.", null))
-    } else {
-    	Future(ApiResponse(200, "share accepted", Json.obj("shareid" -> shareid)))    
-    }
+		MATCH (u:User {uid:'$uid'})-[l]->(pe:PersonalExchange),
+		(s:Share {shareid:'$shareid'})<-[ssr]-(:PersonalExchange)<-[per]-(o:User)
+		WHERE has(s.pending) and s.pending =~ ('.'+u.email+'.*')
+		CREATE UNIQUE (pe)<-[r:share_to {timestamp:timestamp()/1000}]-(s), (u)-[:connected_user]-(o)
+		RETURN s.pending, u.email
+	"""
+		
+    val processed = Cypher(query).apply().map(u => 
+      u[String]("s.pending")->u[String]("u.email")
+	).toArray
+	
+	if(processed.length == 0) {
+    	Future(ApiResponse(200, "share accepted already", Json.obj("shareid" -> shareid)))    	  
+	} else {
+	  val pending = processed.apply(0)._1
+	  val email = processed.apply(0)._2
+	  val a = (pending.stripPrefix("{").stripSuffix("}").trim.split(",").map(_.trim)) diff ((email.split(",").map(_.trim)))
+	  val newpending = "{"+a.mkString(",")+"}"
+	  
+	  val query = s"""
+		MATCH (s:Share {shareid:'$shareid'})
+		SET s.pending='$newpending'
+	  """
+	  if(Cypher(query).execute()) {
+	    Future(ApiResponse(200, "share accepted", Json.obj("shareid" -> shareid, "accepted"->email, "pending" -> newpending)))	  
+	  } else {	  
+	    Future(ApiResponse(501, "Error when modify share pending.", null))
+	  }
+	}
   }
 
 }

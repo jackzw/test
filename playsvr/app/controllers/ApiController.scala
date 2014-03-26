@@ -51,7 +51,9 @@ object AuthAction extends ActionBuilder[AuthenticatedRequest] {
        }
        * */
       
-       val uid = "cc4d4056-1eec-4f5a-b6d0-40a82a49fd58"
+       //val uid = "cc4d4056-1eec-4f5a-b6d0-40a82a49fd58" // user 1
+       val uid = "46030b0c-b80a-4c06-a6de-354db32ccb8b"  // user 2
+        
 	   block(new AuthenticatedRequest(uid, request))
 
     }
