@@ -96,6 +96,18 @@ object Neo4jAdapter {
       }
     }
   }
+    
+  def getSharePhotos(uid: String, shareid: String): Future[ApiResponse] = {
+	val query = s"""
+		MATCH (s:Share {shareid:'$shareid'})<-[r:shared]-(p:Photo)
+		RETURN p.pid
+	  """
+    val photoids = Cypher(query).apply().map(p => 
+      p[String]("p.pid")
+	).toArray
+	
+    Future(ApiResponse(200, "share photos", Json.obj("photos" -> photoids.mkString(","))))
+  }
   
   def sharePhotosAccept(uid: String, shareid: String): Future[ApiResponse] = {
     

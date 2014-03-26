@@ -19,4 +19,5 @@ GET 	/user/connected				controllers.myController.listConnectedUsers(uid: Option[
 
 # use Cypher
 POST	/share/photos				controllers.ShareController.sharePhotos(shareType: Option[Int], pids: String, recipients: String)
+GET		/share/photos				controllers.ShareController.getSharePhotos(shareid: String)
 POST	/share/photos/accept		controllers.ShareController.sharePhotosAccept(shareid: String)

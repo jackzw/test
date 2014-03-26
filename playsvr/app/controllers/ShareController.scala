@@ -23,6 +23,13 @@ object ShareController extends ApiController {
         }
 	}
 	
+	def getSharePhotos(shareid: String) = AuthAction.async {
+        request => {
+            val responseF = Configure.neo4jDatabase.getSharePhotos(request.uid, shareid)
+    		responseF.map( response => apiResponse(response) )
+        }
+	}	
+
 	def sharePhotosAccept(shareid: String) = AuthAction.async {
         request => {
             val responseF = Configure.neo4jDatabase.sharePhotosAccept(request.uid, shareid)
