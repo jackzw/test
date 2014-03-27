@@ -18,6 +18,8 @@ GET     /movie/list                 controllers.MovieController.list
 GET 	/user/connected				controllers.myController.listConnectedUsers(uid: Option[String])
 
 # use Cypher
-POST	/share/photos				controllers.ShareController.sharePhotos(shareType: Option[Int], pids: String, recipients: String)
-GET		/share/photos				controllers.ShareController.getSharePhotos(shareid: String)
-POST	/share/photos/accept		controllers.ShareController.sharePhotosAccept(shareid: String)
+
+PUT		/share/photos				controllers.ShareController.putSharePhotos(shareType: Option[String], pids: String, recipients: String)
+POST	/share/photos				controllers.ShareController.postSharePhotos(shareid: String, status: String)
+GET		/share/photos				controllers.ShareController.getSharePhotos(shareid: Option[String], status: Option[String])
+

@@ -19,6 +19,14 @@ object ConnectedUserInfo {
 	implicit val write = Json.writes[ConnectedUserInfo]
 }
 
+ case class Share(
+		 shareid: String,
+		 timestamp: Long,
+		 photos: List[String])
+object Share {
+	implicit val read = Json.reads[Share]
+	implicit val write = Json.writes[Share]
+}
 object Neo4jAdapter {
   def listConnectedUsers(uid: String): Future[ApiResponse] = {
     val query = s"""
@@ -57,7 +65,7 @@ object Neo4jAdapter {
     	      (:User {uid:'$uid'})-[:connected_user]-(u:User),
     		  (u:User)-[:personal_exchange]->(pe:PersonalExchange) 
     	WHERE $where 
-    	MERGE (s)-[r:shared_to]->(pe) 
+    	MERGE (s)-[r:shared_to {timestamp:timestamp()/1000}]->(pe) 
     	ON CREATE SET r.status=$status 
     	RETURN u.email
     """
@@ -71,7 +79,7 @@ object Neo4jAdapter {
 	Map("validated"->validated.mkString(","), "pending"->pending.mkString(","))
   }
   
-  def sharePhotos(uid: String, pids: String, shareType: Int, recipients: String): Future[ApiResponse] = {
+  def putSharePhotos(uid: String, pids: String, shareType: Int, recipients: String): Future[ApiResponse] = {
     val pidArray = pids.split(",").map(_.trim)
     val shareid = this.createShare(uid, pidArray, shareType)
     if(shareid == null) {
@@ -97,7 +105,7 @@ object Neo4jAdapter {
     }
   }
     
-  def getSharePhotos(uid: String, shareid: String): Future[ApiResponse] = {
+  def getSharePhotosByShareid(uid: String, shareid: String): Future[ApiResponse] = {
 	val query = s"""
 		MATCH (s:Share {shareid:'$shareid'})<-[r:shared]-(p:Photo)
 		RETURN p.pid
@@ -109,7 +117,7 @@ object Neo4jAdapter {
     Future(ApiResponse(200, "share photos", Json.obj("photos" -> photoids.mkString(","))))
   }
   
-  def sharePhotosAccept(uid: String, shareid: String): Future[ApiResponse] = {
+  def postSharePhotosAccept(uid: String, shareid: String): Future[ApiResponse] = {
     
     val query = s"""
 		MATCH (u:User {uid:'$uid'})-[l]->(pe:PersonalExchange),
@@ -142,5 +150,65 @@ object Neo4jAdapter {
 	  }
 	}
   }
+
+  def getSharePhotosSent(uid: String): Future[ApiResponse] = {
+	val query = s"""
+		MATCH (u:User {uid:'$uid'})-[l]->(pe:PersonalExchange)-[r:shared_sent]->(s:Share)<-[:shared]-(p:Photo)
+		RETURN s.shareid,r.timestamp,p.pid 
+		ORDER BY r.timestamp
+	"""
+    val rows = Cypher(query).apply().map(r => 
+      r[String]("s.shareid")->r[Long]("r.timestamp")->r[String]("p.pid")
+	).toList//.map(v => (v._1._1, v._1._2, v._2))
+	
+	val shareList = rows.groupBy(_._1).map(entry => {
+		val ((shareid, timestamp), sharesList) = entry
+		val pidsList = sharesList.foldLeft(List[String]())((acc, share) => acc :+ share._2)
+		val res = new Share(shareid, timestamp, pidsList)
+		res
+	})                                        
+
+    Future(ApiResponse(200, "share photos", Json.obj("shares" -> shareList)))
+  }
+  
+  def getSharePhotosReceived(uid: String): Future[ApiResponse] = {
+	val query = s"""
+		MATCH (u:User {uid:'$uid'})-[l]->(pe:PersonalExchange)<-[r:shared_to]-(s:Share)<-[:shared]-(p:Photo)
+		RETURN s.shareid,r.timestamp,p.pid 
+		ORDER BY r.timestamp
+	"""
+    val rows = Cypher(query).apply().map(r => 
+      r[String]("s.shareid")->r[Long]("r.timestamp")->r[String]("p.pid")
+	).toList
+	
+	val shareList = rows.groupBy(_._1).map(entry => {
+		val ((shareid, timestamp), sharesList) = entry
+		val pidsList = sharesList.foldLeft(List[String]())((acc, share) => acc :+ share._2)
+		val res = new Share(shareid, timestamp, pidsList)
+		res
+	})                                        
+
+    Future(ApiResponse(200, "share photos", Json.obj("shares" -> shareList)))
+  }  
+
+  def getSharePhotos(uid: String): Future[ApiResponse] = {
+	val query = s"""
+		MATCH (u:User {uid:'$uid'})-[l]->(pe:PersonalExchange)-[r]-(s:Share)<-[:shared]-(p:Photo)
+		RETURN s.shareid,r.timestamp,p.pid 
+		ORDER BY r.timestamp
+	"""
+    val rows = Cypher(query).apply().map(r => 
+      r[String]("s.shareid")->r[Long]("r.timestamp")->r[String]("p.pid")
+	).toList
+	
+	val shareList = rows.groupBy(_._1).map(entry => {
+		val ((shareid, timestamp), sharesList) = entry
+		val pidsList = sharesList.foldLeft(List[String]())((acc, share) => acc :+ share._2)
+		val res = new Share(shareid, timestamp, pidsList)
+		res
+	})                                        
+
+    Future(ApiResponse(200, "share photos", Json.obj("shares" -> shareList)))
+  }  
 
 }

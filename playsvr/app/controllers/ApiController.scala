@@ -4,6 +4,7 @@ import play.api.mvc._
 import play.api.libs.json._
 import scala.concurrent.Future
 import play.Logger
+import com.twitter.ostrich.stats.Stats
 
 trait ApiController extends Controller {
     
@@ -36,7 +37,9 @@ trait ApiController extends Controller {
 
 class AuthenticatedRequest[A](val uid: String, request: Request[A]) extends WrappedRequest[A](request)
 
-object AuthAction extends ActionBuilder[AuthenticatedRequest] {
+object AuthAction extends AuthAction {}
+
+class AuthAction extends ActionBuilder[AuthenticatedRequest] {
 
     def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[SimpleResult]) = {
       /*
@@ -56,5 +59,23 @@ object AuthAction extends ActionBuilder[AuthenticatedRequest] {
         
 	   block(new AuthenticatedRequest(uid, request))
 
+    }
+}
+
+object AuthActionWithStats extends AuthAction {
+
+    override def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[SimpleResult]) = {
+    	val path = request.path.replace("/", "_")
+    	Stats.incr(path)
+    	super.invokeBlock(request, block)
+    }
+}
+
+object ActionWithStats extends ActionBuilder[Request] {
+
+    def invokeBlock[A](request: Request[A], block: (Request[A]) => Future[SimpleResult]) = {
+    	val path = request.path.replace("/", "_")
+    	Stats.incr(path)
+    	block(request)
     }
 }

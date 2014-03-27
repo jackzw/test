@@ -19,15 +19,5 @@ object myController extends ApiController {
         }
 	}
 
-	def sharePhotos(shareType: Option[Int], pids: String, recipients: String) = AuthAction.async {
-        request => {
-            val sharetype = shareType match {
-              case Some(t) => t
-              case _ => Enum.SHARE_TYPE_EMAIL
-            }
-            val responseF = Configure.neo4jDatabase.sharePhotos(request.uid, pids, sharetype, recipients)
-    		responseF.map( response => apiResponse(response) )
-        }
-	}
 
 }

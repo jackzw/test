@@ -14,7 +14,8 @@ libraryDependencies ++= Seq(
   cache,
   "com.typesafe.slick" %% "slick" % "2.0.0",
   "org.anormcypher" %% "anormcypher" % "0.4.4",
-  "com.typesafe" %% "play-plugins-mailer" % "2.2.0"
+  "com.typesafe" %% "play-plugins-mailer" % "2.2.0",
+  "com.twitter" %% "ostrich" % "9.4.2"
 )     
 
 play.Project.playScalaSettings

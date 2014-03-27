@@ -12,29 +12,26 @@ import com.typesafe.plugin._
 
 object ShareController extends ApiController {
   
-	def sharePhotos(shareType: Option[Int], pids: String, recipients: String) = AuthAction.async {
+	def putSharePhotos(shareType: Option[String], pids: String, recipients: String) = AuthActionWithStats.async {
         request => {
-            val sharetype = shareType match {
-              case Some(t) => t
-              case _ => Enum.SHARE_TYPE_EMAIL
-            }
-            val responseF = Configure.neo4jDatabase.sharePhotos(request.uid, pids, sharetype, recipients)
+            val responseF = ShareRepo.putSharePhotos(request.uid, pids, shareType, recipients)
     		responseF.map( response => apiResponse(response) )
         }
 	}
 	
-	def getSharePhotos(shareid: String) = AuthAction.async {
+	def postSharePhotos(shareid: String, status: String) = AuthActionWithStats.async {
         request => {
-            val responseF = Configure.neo4jDatabase.getSharePhotos(request.uid, shareid)
+            val responseF = ShareRepo.postSharePhotos(request.uid, shareid, status)
+    		responseF.map( response => apiResponse(response) )
+        }
+	}
+
+	def getSharePhotos(shareid: Option[String], status: Option[String]) = AuthActionWithStats.async {
+        request => {
+            val responseF = ShareRepo.getSharePhotos(request.uid, shareid, status)
     		responseF.map( response => apiResponse(response) )
         }
 	}	
 
-	def sharePhotosAccept(shareid: String) = AuthAction.async {
-        request => {
-            val responseF = Configure.neo4jDatabase.sharePhotosAccept(request.uid, shareid)
-    		responseF.map( response => apiResponse(response) )
-        }
-	}
-	
+
 }
