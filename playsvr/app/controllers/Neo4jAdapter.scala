@@ -48,11 +48,11 @@ object Neo4jAdapter {
 
     val query = s"""
     	MATCH (u:User {uid:'$uid'})-[r]->(pc:PhotoCollection)<-[:uploaded]-(p:Photo),
-    		(u:User)-[l]->(pe:PersonalExchange)
+    		(u)-[l]->(pe:PersonalExchange)
     	WHERE $where
     	CREATE UNIQUE (p)-[:shared]->(s:Share {shareid:'$shareid', shareType:$shareType, timestamp:timestamp()/1000})<-[:shared_sent {timestamp:timestamp()/1000}]-(pe)
     """
-    	
+   	
     if(Cypher(query).execute()) shareid else null
   }
   
@@ -97,10 +97,10 @@ object Neo4jAdapter {
 	    if(!Cypher(query).execute()) {
 	      Future(ApiResponse(501, "Error when set share pending recipient.", null))
 	    } else {
-	    	Future(ApiResponse(200, "Photo shared", Json.obj("shared_to" -> shared_to, "pending" -> pending)))    
+	    	Future(ApiResponse(200, "Photo shared", Json.obj("shareid"->shareid, "shared_to" -> shared_to, "pending" -> pending)))    
 	    }
       } else {
-	    	Future(ApiResponse(200, "Photo shared", Json.obj("shared_to" -> shared_to)))            
+	    	Future(ApiResponse(200, "Photo shared", Json.obj("shareid"->shareid, "shared_to" -> shared_to)))            
       }
     }
   }
@@ -114,7 +114,7 @@ object Neo4jAdapter {
       p[String]("p.pid")
 	).toArray
 	
-    Future(ApiResponse(200, "share photos", Json.obj("photos" -> photoids.mkString(","))))
+    Future(ApiResponse(200, "This share photos", Json.obj("photos" -> photoids.mkString(","))))
   }
   
   def postSharePhotosAccept(uid: String, shareid: String): Future[ApiResponse] = {
@@ -168,7 +168,7 @@ object Neo4jAdapter {
 		res
 	})                                        
 
-    Future(ApiResponse(200, "share photos", Json.obj("shares" -> shareList)))
+    Future(ApiResponse(200, "Sent share photos", Json.obj("shares" -> shareList)))
   }
   
   def getSharePhotosReceived(uid: String): Future[ApiResponse] = {
@@ -188,7 +188,29 @@ object Neo4jAdapter {
 		res
 	})                                        
 
-    Future(ApiResponse(200, "share photos", Json.obj("shares" -> shareList)))
+    Future(ApiResponse(200, "Received share photos", Json.obj("shares" -> shareList)))
+  }
+  
+  def getSharePhotosPending(uid: String): Future[ApiResponse] = {
+	val query = s"""
+		MATCH (u:User {uid:'$uid'}),
+		(pe:PersonalExchange)-[r]->(s:Share)<-[l]-(p:Photo)
+		WHERE has(s.pending) AND s.pending =~ ('.'+u.email+'.*')
+		RETURN s.shareid,r.timestamp,p.pid
+		ORDER BY r.timestamp
+	"""
+    val rows = Cypher(query).apply().map(r => 
+      r[String]("s.shareid")->r[Long]("r.timestamp")->r[String]("p.pid")
+	).toList
+	
+	val shareList = rows.groupBy(_._1).map(entry => {
+		val ((shareid, timestamp), sharesList) = entry
+		val pidsList = sharesList.foldLeft(List[String]())((acc, share) => acc :+ share._2)
+		val res = new Share(shareid, timestamp, pidsList)
+		res
+	})                                        
+
+    Future(ApiResponse(200, "Pending share photos", Json.obj("shares" -> shareList)))
   }  
 
   def getSharePhotos(uid: String): Future[ApiResponse] = {
@@ -208,7 +230,7 @@ object Neo4jAdapter {
 		res
 	})                                        
 
-    Future(ApiResponse(200, "share photos", Json.obj("shares" -> shareList)))
+    Future(ApiResponse(200, "All share photos", Json.obj("shares" -> shareList)))
   }  
 
 }

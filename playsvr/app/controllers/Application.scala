@@ -4,13 +4,24 @@ import play.api._
 import play.api.mvc._
 import play.api.Play.current
 import com.typesafe.plugin._
+import play.api.libs.json.Json
 
 object Application extends Controller {
 
   def index = Action {
     Ok(views.html.index("Your new application is ready."))
   }
+  
+  def setUserid(uid: String) = Action {
+	myMockSessionAdapter.setUid(uid)
+    Ok(Json.obj( "uid" -> uid))
+  }
 
+  def getUserid = Action {
+	val uid = myMockSessionAdapter.getUid()
+    Ok(Json.obj( "uid" -> uid))
+  } 
+  
   def mytest = Action {
 	 
     //val html = views.html.shareInvite("nh")

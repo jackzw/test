@@ -12,6 +12,10 @@ GET     /assets/*file               controllers.Assets.at(path="/public", file)
 # version
 GET     /version                    controllers.VersionController.version
 
+# for test
+POST	/userid						controllers.Application.setUserid(uid)
+GET		/userid						controllers.Application.getUserid()
+
 # movie
 GET     /movie/list                 controllers.MovieController.list
 

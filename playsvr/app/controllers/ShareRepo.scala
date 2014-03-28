@@ -24,6 +24,7 @@ object ShareRepo {
 	    case (None, None) => Configure.neo4jDatabase.getSharePhotos(uid)
 	    case (None, Some("sent")) => Configure.neo4jDatabase.getSharePhotosSent(uid)
 	    case (None, Some("received")) => Configure.neo4jDatabase.getSharePhotosReceived(uid)
+	    case (None, Some("pending")) => Configure.neo4jDatabase.getSharePhotosPending(uid)
 	    case (None, Some(status)) => Configure.neo4jDatabase.getSharePhotosReceived(uid)
 	  }
 	}

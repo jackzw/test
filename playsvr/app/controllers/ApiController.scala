@@ -7,7 +7,7 @@ import play.Logger
 import com.twitter.ostrich.stats.Stats
 
 trait ApiController extends Controller {
-    
+  
 	def apiOk(result: JsValue, message: String = ""): SimpleResult = {
 		Ok(Json.obj( "code" -> 200, 
 		    "message" -> message,
@@ -38,7 +38,7 @@ trait ApiController extends Controller {
 class AuthenticatedRequest[A](val uid: String, request: Request[A]) extends WrappedRequest[A](request)
 
 object AuthAction extends AuthAction {}
-
+  
 class AuthAction extends ActionBuilder[AuthenticatedRequest] {
 
     def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[SimpleResult]) = {
@@ -54,9 +54,8 @@ class AuthAction extends ActionBuilder[AuthenticatedRequest] {
        }
        * */
       
-       //val uid = "cc4d4056-1eec-4f5a-b6d0-40a82a49fd58" // user 1
-       val uid = "46030b0c-b80a-4c06-a6de-354db32ccb8b"  // user 2
-        
+       val uid = myMockSessionAdapter.getUid
+       
 	   block(new AuthenticatedRequest(uid, request))
 
     }

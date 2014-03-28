@@ -15,6 +15,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.slick" %% "slick" % "2.0.0",
   "org.anormcypher" %% "anormcypher" % "0.4.4",
   "com.typesafe" %% "play-plugins-mailer" % "2.2.0",
+  "org.scalatest" % "scalatest_2.10" % "2.1.0" % "test",
   "com.twitter" %% "ostrich" % "9.4.2"
 )     
 
