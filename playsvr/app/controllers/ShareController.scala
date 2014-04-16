@@ -33,5 +33,15 @@ object ShareController extends ApiController {
         }
 	}	
 
-
+/*
+ CREATE (u:User {uid: 'mock', fullname:"mock", email: 'u1@no.com'})-[:photo_collection]->(pc:PhotoCollection),
+	(u)-[:personal_exchange]->(:PersonalExchange),
+	(:PhotoCollection)<-[:photo_collection]-(:User {uid: 'uid2', fullname:"uid2", email: 'u2@no.com'})-[:personal_exchange]->(:PersonalExchange),
+	(:PhotoCollection)<-[:photo_collection]-(:User {uid: 'uid3', fullname:"uid3", email: 'u3@no.com'})-[:personal_exchange]->(:PersonalExchange),
+        	(:Photo {pid:'pid1'})-[:uploaded]->(pc),
+        	(:Photo {pid:'pid2'})-[:uploaded]->(pc),
+        	(:Photo {pid:'pid3'})-[:uploaded]->(pc),
+        	(:Photo {pid:'pid4'})-[:uploaded]->(pc),
+        	(:Photo {pid:'pid5'})-[:uploaded]->(pc)
+ */
 }
