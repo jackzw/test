@@ -34,6 +34,10 @@ object ShareController extends ApiController {
 	}	
 
 /*
+ 	CREATE CONSTRAINT ON (n:User) ASSERT n.uid IS UNIQUE
+	CREATE CONSTRAINT ON (n:User) ASSERT n.email IS UNIQUE
+	CREATE CONSTRAINT ON (n:Share) ASSERT n.shareid IS UNIQUE
+	
  CREATE (u:User {uid: 'mock', fullname:"mock", email: 'u1@no.com'})-[:photo_collection]->(pc:PhotoCollection),
 	(u)-[:personal_exchange]->(:PersonalExchange),
 	(:PhotoCollection)<-[:photo_collection]-(:User {uid: 'uid2', fullname:"uid2", email: 'u2@no.com'})-[:personal_exchange]->(:PersonalExchange),
