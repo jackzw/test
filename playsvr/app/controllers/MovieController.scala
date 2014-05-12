@@ -123,7 +123,7 @@ println("countries: "+countries)
   def schema = {
 	if(!Cypher("CREATE CONSTRAINT ON (n:User) ASSERT n.uid IS UNIQUE").execute()) false
 	else if(!Cypher("CREATE CONSTRAINT ON (n:User) ASSERT n.email IS UNIQUE").execute()) false
-	else if(!Cypher("CREATE CONSTRAINT ON (n:Share) ASSERT n.uid IS UNIQUE").execute()) false
+	else if(!Cypher("CREATE CONSTRAINT ON (n:Share) ASSERT n.shareid IS UNIQUE").execute()) false
 	true
   }
   
