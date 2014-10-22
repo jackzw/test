@@ -16,4 +16,12 @@ object caseClass {
                                                   //| enderEmail3))
 	val emails = list.map(e => e.senderEmail).distinct mkString (",")
                                                   //> emails  : String = senderEmail1,senderEmail2,senderEmail3
+
+	val smtpVerifiedFrom="Kooboodle<no-reply@kooboodle.com>"
+                                                  //> smtpVerifiedFrom  : String = Kooboodle<no-reply@kooboodle.com>
+	val sentFromName = smtpVerifiedFrom.split("<")(0)
+                                                  //> sentFromName  : String = Kooboodle
+	val sentFrom = smtpVerifiedFrom.split("<").last.split(">")(0)
+                                                  //> sentFrom  : String = no-reply@kooboodle.com
+
 }
