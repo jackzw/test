@@ -33,4 +33,12 @@ object caseClass {
 
 	val s ="123"                              //> s  : String = 123
 	val s1 = "+"+s                            //> s1  : String = +123
+	
+	val pathBase = "http://dev-s31409051855.s3.amazonaws.com/2d59cd868d3454478953671/base/201410/948fac5ad19d469ab17ec73eb1af8f43.jpg"
+                                                  //> pathBase  : String = http://dev-s31409051855.s3.amazonaws.com/2d59cd868d3454
+                                                  //| 478953671/base/201410/948fac5ad19d469ab17ec73eb1af8f43.jpg
+  val p = pathBase.split("://")(1)                //> p  : String = dev-s31409051855.s3.amazonaws.com/2d59cd868d3454478953671/base
+                                                  //| /201410/948fac5ad19d469ab17ec73eb1af8f43.jpg
+  p.substring(p.indexOf("/"))                     //> res0: String = /2d59cd868d3454478953671/base/201410/948fac5ad19d469ab17ec73
+                                                  //| eb1af8f43.jpg
 }
