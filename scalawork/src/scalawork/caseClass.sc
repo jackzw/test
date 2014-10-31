@@ -24,4 +24,13 @@ object caseClass {
 	val sentFrom = smtpVerifiedFrom.split("<").last.split(">")(0)
                                                   //> sentFrom  : String = no-reply@kooboodle.com
 
+		val destinationPath = "/05718f30525456717270761/base/201410/af985a78a89549f18fa3f9bd2e9387ed.jpg"
+                                                  //> destinationPath  : String = /05718f30525456717270761/base/201410/af985a78a89
+                                                  //| 549f18fa3f9bd2e9387ed.jpg
+		val dest = destinationPath.stripPrefix("/")
+                                                  //> dest  : String = 05718f30525456717270761/base/201410/af985a78a89549f18fa3f9b
+                                                  //| d2e9387ed.jpg
+
+	val s ="123"                              //> s  : String = 123
+	val s1 = "+"+s                            //> s1  : String = +123
 }
