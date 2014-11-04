@@ -41,4 +41,28 @@ object caseClass {
                                                   //| /201410/948fac5ad19d469ab17ec73eb1af8f43.jpg
   p.substring(p.indexOf("/"))                     //> res0: String = /2d59cd868d3454478953671/base/201410/948fac5ad19d469ab17ec73
                                                   //| eb1af8f43.jpg
+                                                  
+  val Name = """(Mr|Mrs|Ms)\. ([A-Z][a-z]+) ([A-Z][a-z]+)""".r
+                                                  //> Name  : scala.util.matching.Regex = (Mr|Mrs|Ms)\. ([A-Z][a-z]+) ([A-Z][a-z]
+                                                  //| +)
+  val smith = "Mr. John Smith"                    //> smith  : String = Mr. John Smith
+  val matchesFound = Name.findAllIn(smith)        //> matchesFound  : scala.util.matching.Regex.MatchIterator = non-empty iterato
+                                                  //| r
+  matchesFound.foreach(println)                   //> Mr. John Smith
+  val matchList = Name.findAllIn(smith).toList    //> matchList  : List[String] = List(Mr. John Smith)
+  matchList.foreach(println)                      //> Mr. John Smith
+  
+  Name.pattern.matcher(smith).matches             //> res1: Boolean = true
+  
+	val Email = """(.*)@simulator.amazonses.com""".r
+                                                  //> Email  : scala.util.matching.Regex = (.*)@simulator.amazonses.com
+  val Email2 = """(.*)@([0-9]*)mf.ca""".r         //> Email2  : scala.util.matching.Regex = (.*)@([0-9]*)mf.ca
+  val email = "success+user123@simulator.amazonses.com"
+                                                  //> email  : String = success+user123@simulator.amazonses.com
+  val email2 = "myemail@12mf.ca"                  //> email2  : String = myemail@12mf.ca
+  
+  Email.pattern.matcher(email).matches            //> res2: Boolean = true
+  Email.pattern.matcher(email2).matches           //> res3: Boolean = false
+  Email2.pattern.matcher(email).matches           //> res4: Boolean = false
+  Email2.pattern.matcher(email2).matches          //> res5: Boolean = true
 }
