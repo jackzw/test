@@ -16,71 +16,75 @@ import org.graylog2.gelfclient.transport.GelfTransport;
 public class Logger {
 	
     //public attributes
-    private String host = "";
-    private String app = "";
-    private String stack_level = "";
+    private static String host = "";
+    private static String app = "";
+    private static String stack_level = "";
     
-    private String gelfUrl = "127.0.0.1";
-    private int gelfPort = 12201;
+    private static String gelfUrl = "127.0.0.1";
+    private static int gelfPort = 12201;
     
-    private GelfTransports method = GelfTransports.UDP;
-    private int queueSize = 512;
-    private int connectTimeout = 5000;
-    private int reconnectDelay = 1000;
-    private int sendBufferSize = 32768;
-    private boolean tcpNoDelay = true;
+    private static GelfTransports method = GelfTransports.UDP;
+    private static int queueSize = 512;
+    private static int connectTimeout = 5000;
+    private static int reconnectDelay = 1000;
+    private static int sendBufferSize = 32768;
+    private static boolean tcpNoDelay = true;
 
     //public attributes
     public boolean blocking = false;    
     public boolean localLogging = false;
 
-	public Logger(final String gelfUrl, final int gelfPort, final String app, final String stack_level, final String host,
-			final GelfTransports method) {
-		this.gelfUrl = gelfUrl;
-		this.gelfPort = gelfPort;
-		this.app = app;
-		if(stack_level != null)
-			this.stack_level = stack_level;
-		if(host != null) {
-			this.host = host;
-		} else {
-		    try {
-		    	  InetAddress addr = InetAddress.getLocalHost();            
-		    	  this.host = addr.getHostAddress();
-		    	} catch (Exception e) {
-		    		this.host = "localhost";
-		    	}
-		}
-		if(method != null)
-			this.method = method;
-	}
-	
-	public Logger(final String gelfUrl, final int gelfPort, final String app, final String stack_level, final String host) {
-        this(gelfUrl, gelfPort, app, stack_level, host, null);
-	}
-	
-	public Logger(final String gelfUrl, final int gelfPort, final String app, final String stack_level) {
-        this(gelfUrl, gelfPort, app, stack_level, null);
-	}
-	
-	public Logger(final String gelfUrl, final int gelfPort, final String app) {
-        this(gelfUrl, gelfPort, app, null);
-	}
-	
-    
-    org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(Logger.class);
-
     final GelfConfiguration config = new GelfConfiguration(new InetSocketAddress(gelfUrl, gelfPort))
-	    .transport(method)
-	    .queueSize(queueSize)
-	    .connectTimeout(connectTimeout)
-	    .reconnectDelay(reconnectDelay)
-	    .tcpNoDelay(tcpNoDelay)
-	    .sendBufferSize(sendBufferSize);
+			    .transport(method)
+			    .queueSize(queueSize)
+			    .connectTimeout(connectTimeout)
+			    .reconnectDelay(reconnectDelay)
+			    .tcpNoDelay(tcpNoDelay)
+			    .sendBufferSize(sendBufferSize);
 
     final GelfTransport transport = GelfTransports.create(config);
     final GelfMessageBuilder builder = new GelfMessageBuilder("", host); // Source
- 
+
+    final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(app);
+    
+    public Logger() {
+    	
+    }
+    
+	public static Logger getLogger(final String _gelfUrl, final int _gelfPort, final String _app, final String _stack_level, final String _host,
+			final GelfTransports _method) {
+		gelfUrl = _gelfUrl;
+		gelfPort = _gelfPort;
+		app = _app;
+		if(stack_level != null)
+			stack_level = _stack_level;
+		if(_host != null) {
+			host = _host;
+		} else {
+		    try {
+		    	  InetAddress addr = InetAddress.getLocalHost();            
+		    	  host = addr.getHostAddress();
+		    	} catch (Exception e) {
+		    		host = "localhost";
+		    	}
+		}
+		if(_method != null)
+			method = _method;  
+        return new Logger();
+	}
+	
+	public static Logger getLogger(final String gelfUrl, final int gelfPort, final String app, final String stack_level, final String host) {
+		return getLogger(gelfUrl, gelfPort, app, stack_level, host, null);
+	}
+	
+	public static Logger getLogger(final String gelfUrl, final int gelfPort, final String app, final String stack_level) {
+		return getLogger(gelfUrl, gelfPort, app, stack_level, null);
+	}
+	
+	public static Logger getLogger(final String gelfUrl, final int gelfPort, final String app) {
+		return getLogger(gelfUrl, gelfPort, app, null);
+	}
+
     public void debug(String task, String message, String message_type, String content) throws InterruptedException {
     	Map<String,String> calls = getCallTrace();
     	post_gelf(GelfMessageLevel.DEBUG, calls, task, message, message_type, content);
