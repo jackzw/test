@@ -79,11 +79,11 @@ object StringStuff {
       		share :+ Array(sid, ts)
       	  println(share)
       	}
-     }                                            //> [Lscala.Tuple3;@69dbb4d1
-                                                  //| [Lscala.Tuple3;@69dbb4d1
-                                                  //| [Lscala.Tuple3;@69dbb4d1
-                                                  //| [Lscala.Tuple3;@69dbb4d1
-                                                  //| [Lscala.Tuple3;@69dbb4d1
+     }                                            //> [Lscala.Tuple3;@55308275
+                                                  //| [Lscala.Tuple3;@55308275
+                                                  //| [Lscala.Tuple3;@55308275
+                                                  //| [Lscala.Tuple3;@55308275
+                                                  //| [Lscala.Tuple3;@55308275
   val v = share                                   //> v  : Array[(String, String, String)] = Array()
   
   val s = Seq("apple", "oranges", "apple", "banana", "apple", "oranges", "oranges")
@@ -94,5 +94,13 @@ object StringStuff {
                                                   //| , apple, apple))
   s.groupBy(l => l).map(t => (t._1, t._2.length)) //> res4: scala.collection.immutable.Map[String,Int] = Map(banana -> 1, oranges
                                                   //|  -> 3, apple -> 3)
+	def listFunc(items: Option[Int], takenAfter: Option[Int], takenBefore: Option[Int],
+	        getShareState: Option[Boolean])  =  {
 
+		val str = "GET /albums?items="+items+"&takenAfter="+takenAfter+"&takenBefore="+takenBefore+"&getShareState="+getShareState;
+		str
+	}                                         //> listFunc: (items: Option[Int], takenAfter: Option[Int], takenBefore: Option
+                                                  //| [Int], getShareState: Option[Boolean])String
+	listFunc(Some(5),None, None, Some(true))  //> res5: String = GET /albums?items=Some(5)&takenAfter=None&takenBefore=None&g
+                                                  //| etShareState=Some(true)
 }
